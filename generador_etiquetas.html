@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Generador de Etiquetas PDF</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+<style>
+    body { font-family: Arial; max-width: 600px; margin: 40px auto; }
+    input { margin-bottom: 15px; }
+    button { padding: 10px 20px; background:#4CAF50; color:white; border:none; cursor:pointer; }
+</style>
+</head>
+
+<body>
+<h2>Generador de Etiquetas PDF (versión web)</h2>
+
+<label>Excel con nombres:</label><br>
+<input type="file" id="excelInput" accept=".xlsx,.xls"><br><br>
+
+<label>PDF plantilla (una etiqueta por página):</label><br>
+<input type="file" id="pdfInput" accept="application/pdf"><br><br>
+
+<button onclick="generarPDF()">Generar PDF Final</button>
+
+<script>
+async function leerExcel(archivo) {
+    const data = await archivo.arrayBuffer();
+    const workbook = XLSX.read(data, { type: "array" });
+    const primeraHoja = workbook.Sheets[workbook.SheetNames[0]];
+    const datos = XLSX.utils.sheet_to_json(primeraHoja, { header: 1 });
+    return datos.flat(); // una columna → lista simple
+}
+
+async function generarPDF() {
+    const excelFile = document.getElementById("excelInput").files[0];
+    const pdfFile = document.getElementById("pdfInput").files[0];
+
+    if (!excelFile || !pdfFile) {
+        alert("Debe seleccionar un Excel y un PDF.");
+        return;
+    }
+
+    const nombres = await leerExcel(excelFile);
+
+    const pdfBytes = await pdfFile.arrayBuffer();
+    const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
+
+    const paginas = pdfDoc.getPageCount();
+
+    if (paginas !== nombres.length) {
+        alert(`La plantilla tiene ${paginas} páginas y el Excel tiene ${nombres.length} nombres.\nDeben ser iguales.`);
+        return;
+    }
+
+    const fuente = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+
+    const x = 30;
+    const y = 280;
+
+    for (let i = 0; i < paginas; i++) {
+        const page = pdfDoc.getPage(i);
+        page.drawText(String(nombres[i]), {
+            x: x,
+            y: y,
+            size: 12,
+            font: fuente
+        });
+    }
+
+    const pdfFinal = await pdfDoc.save();
+
+    const blob = new Blob([pdfFinal], { type: "application/pdf" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "ETIQUETAS_FINAL.pdf";
+    link.click();
+}
+</script>
+</body>
+</html>
