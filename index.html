@@ -35,7 +35,7 @@
         text-align: center;
         margin-bottom: 30px;
         font-weight: 600;
-        border-bottom: 2px solid #007bff; /* Línea azul bajo el título */
+        border-bottom: 2px solid #ff00c8; /* Línea azul bajo el título */
         display: inline-block;
         padding-bottom: 5px;
         width: 100%;
@@ -65,7 +65,7 @@
     button { 
         width: 100%;
         padding: 15px 20px; 
-        background-color: #007bff; /* Azul profesional */
+        background-color: #ff00c8; /* Azul profesional */
         color: white; 
         border: none; 
         border-radius: 6px;
@@ -77,7 +77,7 @@
 
     /* Efecto Hover en el botón */
     button:hover { 
-        background-color: #0056b3; 
+        background-color: #a400b3; 
         box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
         transform: translateY(-2px); /* Pequeño movimiento hacia arriba */
     }
@@ -86,12 +86,12 @@
 
 <body>
     <div class="container">
-        <h2>Generador de Etiquetas PDF (versión web)</h2>
+        <h2>Generador de Etiquetas (con nombres de productos)</h2>
 
         <label>Excel con nombres:</label>
         <input type="file" id="excelInput" accept=".xlsx,.xls"><br>
 
-        <label>PDF plantilla (una etiqueta por página):</label>
+        <label>PDF plantilla (sin nombres):</label>
         <input type="file" id="pdfInput" accept="application/pdf"><br>
 
         <button onclick="generarPDF()">Generar PDF Final</button>
