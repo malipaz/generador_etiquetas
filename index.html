@@ -5,97 +5,23 @@
 <title>Generador de Etiquetas PDF</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
 <style>
-    /* Estilos Generales */
-    body {
-        font-family: 'Poppins', sans-serif;
-        background-color: #f8b5e2; /* Gris muy claro */
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        margin: 0;
-    }
-
-    /* Estilo Contenedor (La "tarjeta" blanca) */
-    .container {
-        max-width: 500px;
-        background: white;
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); /* Sombra suave */
-    }
-
-    /* Títulos */
-    h2 {
-        color: #333;
-        text-align: center;
-        margin-bottom: 30px;
-        font-weight: 600;
-        border-bottom: 2px solid #ff00c8; /* Línea azul bajo el título */
-        display: inline-block;
-        padding-bottom: 5px;
-        width: 100%;
-    }
-    
-    /* Etiquetas (Labels) */
-    label { 
-        display: block; 
-        margin-bottom: 8px; 
-        font-weight: 600; 
-        color: #555;
-    }
-
-    /* Inputs de Archivo (Se ajustan para ser más limpios) */
-    input[type="file"] {
-        margin-bottom: 25px;
-        padding: 10px;
-        display: block;
-        width: 100%;
-        box-sizing: border-box;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        background-color: #fafafa;
-    }
-    
-    /* Botón de Acción */
-    button { 
-        width: 100%;
-        padding: 15px 20px; 
-        background-color: #ff00c8; /* Color principal */
-        color: white; 
-        border: none; 
-        border-radius: 6px;
-        cursor: pointer; 
-        font-size: 16px;
-        font-weight: 600;
-        transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
-    }
-
-    /* Efecto Hover en el botón */
-    button:hover { 
-        background-color: #a400b3; 
-        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
-        transform: translateY(-2px); /* Pequeño movimiento hacia arriba */
-    }
+    body { font-family: Arial; max-width: 600px; margin: 40px auto; }
+    input { margin-bottom: 15px; }
+    button { padding: 10px 20px; background:#4CAF50; color:white; border:none; cursor:pointer; }
 </style>
 </head>
 
 <body>
-    <div class="container">
-        <h2>Generador de Etiquetas (con nombres de productos)</h2>
+<h2>Generador de Etiquetas PDF (versión web)</h2>
 
-        <label>Excel con nombres:</label>
-        <input type="file" id="excelInput" accept=".xlsx,.xls"><br>
+<label>Excel con nombres:</label><br>
+<input type="file" id="excelInput" accept=".xlsx,.xls"><br><br>
 
-        <label>PDF plantilla (sin nombres):</label>
-        <input type="file" id="pdfInput" accept="application/pdf"><br>
+<label>PDF plantilla (una etiqueta por página):</label><br>
+<input type="file" id="pdfInput" accept="application/pdf"><br><br>
 
-        <button onclick="generarPDF()">Generar PDF Final</button>
-    </div>
+<button onclick="generarPDF()">Generar PDF Final</button>
 
 <script>
 async function leerExcel(archivo) {
@@ -109,7 +35,7 @@ async function leerExcel(archivo) {
 async function generarPDF() {
     const excelFile = document.getElementById("excelInput").files[0];
     const pdfFile = document.getElementById("pdfInput").files[0];
-    const nombreArchivo = "ETIQUETAS_FINAL.pdf"; // Nombre de archivo definido
+    const nombreArchivo = "ETIQUETAS_FINAL.pdf"; // El nombre de archivo por defecto
 
     if (!excelFile || !pdfFile) {
         alert("Debe seleccionar un Excel y un PDF.");
@@ -148,11 +74,11 @@ async function generarPDF() {
     const blob = new Blob([pdfFinal], { type: "application/pdf" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = nombreArchivo;
+    link.download = nombreArchivo; // Usa la variable nombreArchivo
     link.click();
-
+    
     // ----------------------------------------------------------------
-    // --- AVISO DE ÉXITO AGREGADO AQUÍ ---
+    // --- CÓDIGO AGREGADO PARA EL AVISO DE ÉXITO ---
     // ----------------------------------------------------------------
     alert(`✅ ¡PDF Generado con Éxito!\n\nEl archivo "${nombreArchivo}" se ha descargado.\n\nGeneralmente se guarda en la carpeta "Descargas" (Downloads) de su navegador.`);
 }
