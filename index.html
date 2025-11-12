@@ -5,81 +5,151 @@
 <title>Generador de Etiquetas PDF</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
 <style>
-    body { font-family: Arial; max-width: 600px; margin: 40px auto; }
-    input { margin-bottom: 15px; }
-    button { padding: 10px 20px; background:#4CAF50; color:white; border:none; cursor:pointer; }
+    /* Estilos Generales */
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f8b5e2; /* Gris muy claro */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+    }
+
+    /* Estilo Contenedor (La "tarjeta" blanca) */
+    .container {
+        max-width: 500px;
+        background: white;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    }
+
+    /* Títulos */
+    h2 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 30px;
+        font-weight: 600;
+        border-bottom: 2px solid #ff00c8; /* Línea azul bajo el título */
+        display: inline-block;
+        padding-bottom: 5px;
+        width: 100%;
+    }
+    
+    /* Etiquetas (Labels) */
+    label { 
+        display: block; 
+        margin-bottom: 8px; 
+        font-weight: 600; 
+        color: #555;
+    }
+
+    /* Inputs de Archivo (Se ajustan para ser más limpios) */
+    input[type="file"] {
+        margin-bottom: 25px;
+        padding: 10px;
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background-color: #fafafa;
+    }
+    
+    /* Botón de Acción */
+    button { 
+        width: 100%;
+        padding: 15px 20px; 
+        background-color: #ff00c8; /* Azul profesional */
+        color: white; 
+        border: none; 
+        border-radius: 6px;
+        cursor: pointer; 
+        font-size: 16px;
+        font-weight: 600;
+        transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease;
+    }
+
+    /* Efecto Hover en el botón */
+    button:hover { 
+        background-color: #a400b3; 
+        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
+        transform: translateY(-2px); /* Pequeño movimiento hacia arriba */
+    }
 </style>
 </head>
 
 <body>
-<h2>Generador de Etiquetas PDF (versión web)</h2>
+    <div class="container">
+        <h2>Generador de Etiquetas (con nombres de productos)</h2>
 
-<label>Excel con nombres:</label><br>
-<input type="file" id="excelInput" accept=".xlsx,.xls"><br><br>
+        <label>Excel con nombres:</label>
+        <input type="file" id="excelInput" accept=".xlsx,.xls"><br>
 
-<label>PDF plantilla (una etiqueta por página):</label><br>
-<input type="file" id="pdfInput" accept="application/pdf"><br><br>
+        <label>PDF plantilla (sin nombres):</label>
+        <input type="file" id="pdfInput" accept="application/pdf"><br>
 
-<button onclick="generarPDF()">Generar PDF Final</button>
+        <button onclick="generarPDF()">Generar PDF Final</button>
+    </div>
 
 <script>
 async function leerExcel(archivo) {
-    const data = await archivo.arrayBuffer();
-    const workbook = XLSX.read(data, { type: "array" });
-    const primeraHoja = workbook.Sheets[workbook.SheetNames[0]];
-    const datos = XLSX.utils.sheet_to_json(primeraHoja, { header: 1 });
-    return datos.flat(); // una columna → lista simple
+    const data = await archivo.arrayBuffer();
+    const workbook = XLSX.read(data, { type: "array" });
+    const primeraHoja = workbook.Sheets[workbook.SheetNames[0]];
+    const datos = XLSX.utils.sheet_to_json(primeraHoja, { header: 1 });
+    return datos.flat(); // una columna → lista simple
 }
 
 async function generarPDF() {
-    const excelFile = document.getElementById("excelInput").files[0];
-    const pdfFile = document.getElementById("pdfInput").files[0];
-    const nombreArchivo = "ETIQUETAS_FINAL.pdf"; // El nombre de archivo por defecto
+    const excelFile = document.getElementById("excelInput").files[0];
+    const pdfFile = document.getElementById("pdfInput").files[0];
+    const nombreArchivo = "ETIQUETAS_FINAL.pdf";
 
-    if (!excelFile || !pdfFile) {
-        alert("Debe seleccionar un Excel y un PDF.");
-        return;
-    }
+    if (!excelFile || !pdfFile) {
+        alert("Debe seleccionar un Excel y un PDF.");
+        return;
+    }
 
-    const nombres = await leerExcel(excelFile);
+    const nombres = await leerExcel(excelFile);
 
-    const pdfBytes = await pdfFile.arrayBuffer();
-    const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
+    const pdfBytes = await pdfFile.arrayBuffer();
+    const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
 
-    const paginas = pdfDoc.getPageCount();
+    const paginas = pdfDoc.getPageCount();
 
-    if (paginas !== nombres.length) {
-        alert(`La plantilla tiene ${paginas} páginas y el Excel tiene ${nombres.length} nombres.\nDeben ser iguales.`);
-        return;
-    }
+    if (paginas !== nombres.length) {
+        alert(`La plantilla tiene ${paginas} páginas y el Excel tiene ${nombres.length} nombres.\nDeben ser iguales.`);
+        return;
+    }
 
-    const fuente = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+    const fuente = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
 
-    const x = 30;
-    const y = 280;
+    const x = 30;
+    const y = 280;
 
-    for (let i = 0; i < paginas; i++) {
-        const page = pdfDoc.getPage(i);
-        page.drawText(String(nombres[i]), {
-            x: x,
-            y: y,
-            size: 12,
-            font: fuente
-        });
-    }
+    for (let i = 0; i < paginas; i++) {
+        const page = pdfDoc.getPage(i);
+        page.drawText(String(nombres[i]), {
+            x: x,
+            y: y,
+            size: 12,
+            font: fuente
+        });
+    }
 
-    const pdfFinal = await pdfDoc.save();
+    const pdfFinal = await pdfDoc.save();
 
-    const blob = new Blob([pdfFinal], { type: "application/pdf" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = nombreArchivo; // Usa la variable nombreArchivo
-    link.click();
-    
-    // ----------------------------------------------------------------
-    // --- CÓDIGO AGREGADO PARA EL AVISO DE ÉXITO ---
-    // ----------------------------------------------------------------
+    const blob = new Blob([pdfFinal], { type: "application/pdf" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "ETIQUETAS_FINAL.pdf";
+    link.click();
     alert(`✅ ¡PDF Generado con Éxito!\n\nEl archivo "${nombreArchivo}" se ha descargado.\n\nGeneralmente se guarda en la carpeta "Descargas" (Downloads) de su navegador.`);
 }
 </script>
